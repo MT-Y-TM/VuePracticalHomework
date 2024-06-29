@@ -1,0 +1,15 @@
+{
+  "apps": [{
+    "name": "shop-backend",
+    "script": "production.js",
+    "cwd": "C:\Users\www\Desktop\vue3教材项目\chapter08\shop-backend",
+    "exec_mode": "fork",
+    "max_memory_restart": "1G",
+    "autorestart": true,
+    "node_args": [],
+    "args": [],
+    "env": {
+      
+    }
+  }]
+}

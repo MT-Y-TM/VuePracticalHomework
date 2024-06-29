@@ -1,0 +1,28 @@
+{
+  "name": "reimi",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "2.0.10",
+    "ant-design-vue": "^4.2.3",
+    "axios": "1.2.2",
+    "element-plus": "2.2.27",
+    "pinia": "2.0.27",
+    "pinia-plugin-persist": "1.0",
+    "sass": "1.57.1",
+    "vue": "^3.4.29",
+    "vue-router": "4.0.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "unplugin-auto-import": "0.16.6",
+    "unplugin-vue-components": "0.25.1",
+    "vite": "^5.3.1"
+  }
+}
