@@ -28,21 +28,24 @@ import { useRouter } from 'vue-router';
 .a-layout {
   height: 100%;
   .a-layout-header {
-    background: -webkit-gradient(linear, left top, right top, from(#1493fa), to(#01c6fa));
+ 
     text-align: center;
     line-height: 60px;
-    color: #333;
+    color: #949494;
   }
   .a-layout-sider {
     width: 200px;
     height: 100%;
-    color: #333;
-    background: white;
+    color: #7a7a7a;
+    background: rgb(75, 75, 75);
   }
   .a-layout-content {
     height: 100vh;
-    background-color: #e9eef3;
+    background-color: #585858;
     color: #333;
   }
+}
+.ant-layout-header{
+  background-color: rgb(61, 61, 61)
 }
 </style>

@@ -5,10 +5,6 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            path: '/',
-            redirect: '/index',
-        },
-        {
             path: '/index',
             name: 'index',
             component: Index,
@@ -17,7 +13,7 @@ const router = createRouter({
                 {
                     path: '',
                     name: 'index-home',
-                    component: () => import('./pages/Index.vue'),
+                    component: () => import('./pages/subpages/Index.vue'),
                     meta: { title: '首页' },
                 },
                 {

@@ -1,19 +1,19 @@
 <template>
-    <div class="header-container">
-      <div class="navbar">“微商城”后台管理系统</div>
-      <el-menu class="el-menu-demo" mode="horizontal" :ellipsis="false">
-        <el-sub-menu class="menu" index="1">
-          <template #title>
-            <el-avatar class="avatar" :src="admin.avatar"> {{ admin.username }} </el-avatar>
-          </template>
-          <router-link :to="{ name: 'setting' }">
-            <el-menu-item index="5">个人中心</el-menu-item>
-          </router-link>
-          <el-menu-item index="6" @click="onLogout">退出登录</el-menu-item>
-        </el-sub-menu>
-      </el-menu>
-    </div>
-  </template>
+  <div class="header-container">
+    <div class="navbar">“微商城”后台管理系统</div>
+    <a-menu mode="horizontal" :ellipsis="false">
+      <a-sub-menu key="1">
+        <template #title>
+          <a-avatar class="avatar" :src="admin.avatar"> {{ admin.username }} </a-avatar>
+        </template>
+        <router-link :to="{ name: 'setting' }">
+          <a-menu-item key="5">个人中心</a-menu-item>
+        </router-link>
+        <a-menu-item key="6" @click="onLogout">退出登录</a-menu-item>
+      </a-sub-menu>
+    </a-menu>
+  </div>
+</template>
 
 
 <script setup>
@@ -66,6 +66,7 @@ const onLogout = async () => {
 .navbar {
   font-size: 40px;
   font-weight: bold;
+  color: white;
 }
 
 .el-menu-demo {
