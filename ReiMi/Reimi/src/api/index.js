@@ -1,4 +1,5 @@
 import request from '../utils/request'
+import config from '../config'
 
 // 登录接口
 export function login(data) {
@@ -10,6 +11,7 @@ export function getAdmin(){
   return request.get('/admin/admin')
 }
 
+// 修改密码接口
 export function changeAdminPassword(data) {
   return request.post('/admin/admin/changePassword', data)
   }
@@ -21,3 +23,4 @@ export function changeAdminPassword(data) {
   export function uploadPictureURL() {
   return config.baseURL + '/admin/upload/picture'
   }
+  
