@@ -61,12 +61,14 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import defaultAvatarURL from '/images/avatar-default.png';
-import { uploadPictureURL } from '../../api';
+import { uploadPictureURL, changeAdminPassword, changeAdminAvatar } from '../../api';
 import useToken from '../../stores/token';
 import useAdmin from '../../stores/admin';
+import router from '../../router';
+import notification from '../../utils/notification';
 
-const { admin } = useAdmin();
-const { token } = useToken();
+const { admin, removeAdmin, updateAdmin } = useAdmin();
+const { token, removeToken } = useToken();
 
 const headers = { jwt: token };
 const uploadURL = uploadPictureURL();
@@ -81,9 +83,25 @@ const avatarURL = ref(admin.avatar || defaultAvatarURL);
 const ruleFormRef = ref();
 const uploadRef = ref();
 
-// 修改密码
 const submitForm = formEl => {
-  // 提交表单逻辑
+  formEl.validate(async valid => {
+    if (valid) {
+      await changeAdminPassword({ password: form.password });
+      resetForm();
+      removeToken();
+      removeAdmin();
+      router.push({ name: 'login' });
+      notification({
+        message: '修改密码后，请重新登录',
+        type: 'warning'
+      });
+    } else {
+      notification({
+        message: '表单填写有误',
+        type: 'error'
+      });
+    }
+  });
 };
 
 const resetForm = () => {
@@ -94,9 +112,29 @@ const submitUpload = () => {
   uploadRef.value.submit();
 };
 
-// 上传成功
 const uploadSuccess = async response => {
-  // 上传成功逻辑
+  const { errno, errmsg, data } = response;
+  if (errno !== 0) {
+    notification({
+      message: errmsg,
+      type: 'error'
+    });
+  } else {
+    if (errmsg !== '') {
+      notification({
+        message: errmsg,
+        type: 'success'
+      });
+    }
+    await changeAdminAvatar({
+      avatar: data.savepath
+    });
+    updateAdmin({
+      avatar: data.url
+    });
+    avatarURL.value = data.url;
+  }
+  uploadRef.value.clearFiles();
 };
 
 const validatePass = (rule, value, callback) => {
