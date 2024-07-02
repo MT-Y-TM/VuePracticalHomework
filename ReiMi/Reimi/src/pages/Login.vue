@@ -82,7 +82,7 @@ const onSubmit = () => {
       console.log(data.token)
       if (data) {
         updateToken(data.token);
-        router.push({ name: 'index' });
+        router.push({ name: 'index-home' });
       } else {
         notification({
           type: 'error',

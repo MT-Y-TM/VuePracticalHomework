@@ -14,7 +14,7 @@
   "resolved" "https://registry.npmjs.org/@ant-design/icons-svg/-/icons-svg-4.4.2.tgz"
   "version" "4.4.2"
 
-"@ant-design/icons-vue@^7.0.0":
+"@ant-design/icons-vue@^7.0.0", "@ant-design/icons-vue@^7.0.1":
   "integrity" "sha512-eCqY2unfZK6Fe02AwFlDHLfoyEFreP6rBwAZMIJ1LugmfMiVgwWDYlp1YsRugaPtICYOabV1iWxXdP12u9U43Q=="
   "resolved" "https://registry.npmjs.org/@ant-design/icons-vue/-/icons-vue-7.0.1.tgz"
   "version" "7.0.1"
@@ -428,6 +428,14 @@
   "integrity" "sha512-bvVTQe1lfaUr1oFzZX80ce9KLDlZ3iU+XGNE/bz9HnGdklTieqsbmsLHe+rT2XWqopvL0PckkYqN7ksmm5pe3w=="
   "resolved" "https://registry.npmjs.org/dom-scroll-into-view/-/dom-scroll-into-view-2.0.1.tgz"
   "version" "2.0.1"
+
+"echarts@5.4.2":
+  "integrity" "sha512-2W3vw3oI2tWJdyAz+b8DuWS0nfXtSDqlDmqgin/lfzbkB01cuMEN66KWBlmur3YMp5nEDEEt5s23pllnAzB4EA=="
+  "resolved" "https://registry.npmjs.org/echarts/-/echarts-5.4.2.tgz"
+  "version" "5.4.2"
+  dependencies:
+    "tslib" "2.3.0"
+    "zrender" "5.4.3"
 
 "element-plus@2.2.27":
   "integrity" "sha512-P04HDOZBYDdvlYuleuCZRULzAc5xJVOBfLDK9xWxVo0vyo8ntdaXS5sTU+/76vrNzuO3FhLn9kvrsbiJEVa1jg=="
@@ -915,6 +923,11 @@
   dependencies:
     "is-number" "^7.0.0"
 
+"tslib@2.3.0":
+  "integrity" "sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg=="
+  "resolved" "https://registry.npmjs.org/tslib/-/tslib-2.3.0.tgz"
+  "version" "2.3.0"
+
 "ufo@^1.5.3":
   "integrity" "sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw=="
   "resolved" "https://registry.npmjs.org/ufo/-/ufo-1.5.3.tgz"
@@ -1041,3 +1054,10 @@
   "integrity" "sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ=="
   "resolved" "https://registry.npmjs.org/webpack-virtual-modules/-/webpack-virtual-modules-0.6.2.tgz"
   "version" "0.6.2"
+
+"zrender@5.4.3":
+  "integrity" "sha512-DRUM4ZLnoaT0PBVvGBDO9oWIDBKFdAVieNWxWwK0niYzJCMwGchRk21/hsE+RKkIveH3XHCyvXcJDkgLVvfizQ=="
+  "resolved" "https://registry.npmjs.org/zrender/-/zrender-5.4.3.tgz"
+  "version" "5.4.3"
+  dependencies:
+    "tslib" "2.3.0"

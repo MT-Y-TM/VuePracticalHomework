@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "@element-plus/icons-vue": "2.0.10",
     "ant-design-vue": "^4.2.3",
     "axios": "1.2.2",
+    "echarts": "5.4.2",
     "element-plus": "2.2.27",
     "pinia": "2.0.27",
     "pinia-plugin-persist": "1.0",

@@ -11,7 +11,7 @@ const router = createRouter({
             meta: { title: '首页' },
             children: [
                 {
-                    path: '',
+                    path: 'index',
                     name: 'index-home',
                     component: () => import('./pages/subpages/Index.vue'),
                     meta: { title: '首页' },
