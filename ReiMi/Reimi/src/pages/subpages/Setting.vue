@@ -40,18 +40,18 @@
           <div class="card-header">个人信息</div>
         </template>
         <div class="change-password-box">
-          <el-form ref="ruleFormRef" status-icon :model="form" :rules="rules" label-width="140px">
-            <el-form-item prop="password" label="修改密码">
-              <el-input type="password" v-model="form.password" />
-            </el-form-item>
-            <el-form-item prop="password2" label="请再次输入密码">
-              <el-input type="password" v-model="form.password2" />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="submitForm(ruleFormRef)">提交</el-button>
-              <el-button @click="resetForm">重置</el-button>
-            </el-form-item>
-          </el-form>
+          <a-form ref="ruleFormRef" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+            <a-form-item label="修改密码" name="password">
+              <a-input-password v-model:value="form.password" />
+            </a-form-item>
+            <a-form-item label="请再次输入密码" name="password2">
+              <a-input-password v-model:value="form.password2" />
+            </a-form-item>
+            <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
+              <a-button type="primary" @click="submitForm">提交</a-button>
+              <a-button @click="resetForm">重置</a-button>
+            </a-form-item>
+          </a-form>
         </div>
       </el-card>
     </el-col>
@@ -83,25 +83,24 @@ const avatarURL = ref(admin.avatar || defaultAvatarURL);
 const ruleFormRef = ref();
 const uploadRef = ref();
 
-const submitForm = formEl => {
-  formEl.validate(async valid => {
-    if (valid) {
-      await changeAdminPassword({ password: form.password });
-      resetForm();
-      removeToken();
-      removeAdmin();
-      router.push({ name: 'login' });
-      notification({
-        message: '修改密码后，请重新登录',
-        type: 'warning'
-      });
-    } else {
-      notification({
-        message: '表单填写有误',
-        type: 'error'
-      });
-    }
-  });
+const submitForm = async () => {
+  try {
+    await ruleFormRef.value.validate();
+    await changeAdminPassword({ password: form.password });
+    resetForm();
+    removeToken();
+    removeAdmin();
+    router.push({ name: 'login' });
+    notification({
+      message: '修改密码后，请重新登录',
+      type: 'warning'
+    });
+  } catch (error) {
+    notification({
+      message: '表单填写有误',
+      type: 'error'
+    });
+  }
 };
 
 const resetForm = () => {
@@ -137,15 +136,13 @@ const uploadSuccess = async response => {
   uploadRef.value.clearFiles();
 };
 
-const validatePass = (rule, value, callback) => {
+const validatePass = async (rule, value) => {
   if (value !== form.password) {
-    callback(new Error('两次输入密码不一致！'));
-  } else {
-    callback();
+    throw new Error('两次输入密码不一致！');
   }
 };
 
-const rules = reactive({
+const rules = {
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 24, message: '密码长度为 6~24 个字符', trigger: 'blur' }
@@ -154,7 +151,7 @@ const rules = reactive({
     { required: true, message: '请输入密码', trigger: 'blur' },
     { validator: validatePass, trigger: 'blur' }
   ]
-});
+};
 </script>
 
 <style lang="scss" scoped>
