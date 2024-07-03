@@ -1,68 +1,99 @@
 <template>
-  <a-upload
-    :file-list="fileList"
-    :before-upload="beforeUpload"
-    @remove="handleRemove"
-    :max-count="1"
-    list-type="picture"
-    @change="handleChange"
-  >
-    <a-button>
-      <upload-outlined></upload-outlined>
-      选择图片
-    </a-button>
-  </a-upload>
-  <a-button 
-    :type="primary" 
-    @click="handleUpload" 
-    :disabled="fileList.length === 0">
-    上传
-  </a-button>
-  <p>限制上传 1 个文件，且旧文件会被新文件覆盖</p>
+  <el-col :span="16">
+    <el-card class="box-card">
+      <template #header>
+        <div class="card-header">个人信息</div>
+      </template>
+      <div class="change-password-box">
+        <el-form 
+        ref="ruleFormRef" 
+        :model="form" 
+        :rules="rules" >
+          <a-form-item label="修改密码" name="password">
+            <a-input-password v-model:value="form.password" />
+          </a-form-item>
+          <a-form-item label="请再次输入密码" name="password2">
+            <a-input-password v-model:value="form.password2" />
+          </a-form-item>
+          <el-form-item :wrapper-col="{ offset: 6, span: 14 }">
+            <a-button type="primary" @click="submitForm(ruleFormRef)">提交</a-button>
+            <a-button @click="resetForm">重置</a-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-card>
+  </el-col>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { UploadOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
+import { ref, reactive } from 'vue';
+import defaultAvatarURL from '/images/avatar-default.png';
+import { uploadPictureURL, changeAdminPassword, changeAdminAvatar } from '../api';
+import useToken from '../stores/token';
+import useAdmin from '../stores/admin';
+import router from '../router';
+import notification from '../utils/notification';
 
-const fileList = ref([]);
+const { admin, removeAdmin, updateAdmin } = useAdmin();
+const { token, removeToken } = useToken();
 
-const beforeUpload = (file) => {
-  // 清空 fileList 以确保只有一个文件
-  fileList.value = [file];
-  return false; // 阻止自动上传
+const form = reactive({
+  password: '',
+  password2: ''
+});
+
+const rules = {
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' }
+  ],
+  password2: [
+    { required: true, message: '请再次输入密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' },
+    { validator: validate , trigger: 'blur' }
+  ]
 };
 
-const handleRemove = (file) => {
-  // 移除文件时清空 fileList
-  fileList.value = [];
-};
 
-const handleChange = (info) => {
-  // 处理文件选择变化
-  if (info.file.status === 'removed') {
-    fileList.value = [];
+const validate = (rule, value, callback) => {
+  if (value !== form.password) {
+    callback(new Error('两次输入的密码不一致!'));
+  } else {
+    callback();
   }
 };
 
-const handleUpload = () => {
-  if (fileList.value.length === 0) {
-    message.warning('请先选择图片');
-    return;
-  }
 
-  const formData = new FormData();
-  formData.append('file', fileList.value[0]);
-
-  // 这里可以添加你的上传逻辑，例如使用 axios 发送请求
-  // axios.post('/upload', formData).then(response => {
-  //   message.success('上传成功');
-  // }).catch(error => {
-  //   message.error('上传失败');
-  // });
-
-  console.log('上传文件:', fileList.value[0]);
-  message.success('上传成功');
+const submitForm = (ruleFormRef) => {
+  ruleFormRef.validate((valid) => {
+    if (valid) {
+      changeAdminPassword(token.value, form.password, form.password2).then(res => {
+        if (res.code === 200) {
+          notification.success({
+            message: '修改密码成功',
+            description: '请重新登录'
+          });
+          removeToken();
+          router.push('/login');
+        } else {
+          notification.error({
+            message: '修改密码失败',
+            description: res.message
+          });
+        }
+      });
+    } else {
+      console.log('error submit!!');
+      return false;
+    }
+  });
 };
+
+
+const resetForm = () => {
+  form.password = '';
+  form.password2 = '';
+};
+
+
 </script>
