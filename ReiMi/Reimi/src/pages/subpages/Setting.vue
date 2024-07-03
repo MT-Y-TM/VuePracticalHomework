@@ -40,19 +40,16 @@
           <div class="card-header">个人信息</div>
         </template>
         <div class="change-password-box">
-          <el-form 
-          ref="ruleFormRef" 
-          :model="form" 
-          :rules="rules" >
-            <a-form-item label="修改密码" name="password">
-              <a-input-password v-model:value="form.password" />
-            </a-form-item>
-            <a-form-item label="请再次输入密码" name="password2">
-              <a-input-password v-model:value="form.password2" />
-            </a-form-item>
-            <el-form-item :wrapper-col="{ offset: 6, span: 14 }">
-              <a-button type="primary" @click="submitForm(ruleFormRef)">提交</a-button>
-              <a-button @click="resetForm">重置</a-button>
+          <el-form ref="ruleFormRef" status-icon :model="form" :rules="rules" label-width="140px">
+            <el-form-item prop="password" label="修改密码">
+              <el-input type="password" v-model="form.password" />
+            </el-form-item>
+            <el-form-item prop="password2" label="请再次输入密码">
+              <el-input type="password" v-model="form.password2" />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="submitForm(ruleFormRef)">提交</el-button>
+              <el-button @click="resetForm">重置</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -85,7 +82,7 @@ const form = reactive({
 const avatarURL = ref(admin.avatar || defaultAvatarURL);
 const ruleFormRef = ref();
 const uploadRef = ref();
-//提交表单
+
 const submitForm = formEl => {
   formEl.validate(async valid => {
     if (valid) {
@@ -106,15 +103,15 @@ const submitForm = formEl => {
     }
   });
 };
-//重置表单
+
 const resetForm = () => {
   ruleFormRef.value.resetFields();
 };
-//选择头像
+
 const submitUpload = () => {
   uploadRef.value.submit();
 };
-//上传头像成功回调
+
 const uploadSuccess = async response => {
   const { errno, errmsg, data } = response;
   if (errno !== 0) {
