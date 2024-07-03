@@ -56,6 +56,8 @@
       </el-card>
     </el-col>
   </el-row>
+
+
 </template>
 
 <script setup>
@@ -107,7 +109,7 @@ const submitForm = formEl => {
 const resetForm = () => {
   ruleFormRef.value.resetFields();
 };
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const submitUpload = () => {
   uploadRef.value.submit();
 };
@@ -136,7 +138,7 @@ const uploadSuccess = async response => {
   }
   uploadRef.value.clearFiles();
 };
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 const validatePass = (rule, value, callback) => {
   if (value !== form.password) {
     callback(new Error('两次输入密码不一致！'));
@@ -155,6 +157,10 @@ const rules = reactive({
     { validator: validatePass, trigger: 'blur' }
   ]
 });
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 </script>
 
 <style lang="scss" scoped>
