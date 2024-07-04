@@ -24,7 +24,7 @@
       </template>
     </a-table>
     <!-- 新增分类的弹出框 -->
-    <a-drawer v-model:visible="dialogVisible" title="分类编辑" placement="right" :wrap-style="{ width: '80%' }">
+    <a-drawer v-model:open="dialogVisible" title="分类编辑" placement="right" :wrap-style="{ width: '80%' }">
       <CategoryEdit ref="categoryForm" :id="id" @success="editSuccess" />
     </a-drawer>
   </div>
@@ -33,7 +33,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getCategoryList, delCategory } from '../api'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import CategoryEdit from '../components/CategoryEdit.vue'
 
 const tableData = ref([])
@@ -125,11 +125,14 @@ const delRow = async row => {
   if (row.pid == 0 && row.children.length != 0) {
     message.warning('该分类下存在二级分类，请先删除二级分类再删除此分类')
   } else {
-    const confirmResult = await message.confirm('确定要删除此分类吗？')
-    if (confirmResult === 'ok') {
-      if (await delCategory({ id: row.id })) {
-        loadCategoryList()
+    const confirmResult = await Modal.confirm({
+      title: '确定要删除此分类吗？',
+      onOk() {
+        return delCategory({ id: row.id })
       }
+    })
+    if (confirmResult) {
+      loadCategoryList()
     }
   }
 }
