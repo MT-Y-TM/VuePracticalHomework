@@ -41,10 +41,10 @@
         </template>
         <div class="change-password-box">
           <a-form ref="ruleFormRef" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-            <a-form-item label="修改密码" name="password">
+            <a-form-item label="请输入修改的密码" name="password">
               <a-input-password v-model:value="form.password" />
             </a-form-item>
-            <a-form-item label="请再次输入密码" name="password2">
+            <a-form-item label="请再一次输入密码" name="password2">
               <a-input-password v-model:value="form.password2" />
             </a-form-item>
             <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
