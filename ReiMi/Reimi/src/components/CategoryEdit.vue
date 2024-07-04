@@ -1,50 +1,44 @@
 <template>
-  <el-form ref="formRef" :model="form" label-width="120px">
+  <a-form ref="formRef" :model="form" label-width="120px">
     <!-- 分类名称 -->
-    <a-form-item name="name" label="分类名称" >
+    <a-form-item label="分类名称" :rules="[{ required: true, message: '请填写分类名称', trigger: 'blur' }]">
       <a-input v-model:value="form.name" placeholder="请填写分类名称" />
     </a-form-item>
     <!-- 是否为二级分类 -->
-    <el-form-item label="二级分类">
+    <a-form-item label="二级分类">
       <a-radio-group v-model:value="showMore">
         <a-radio :value="true" :disabled="form.id !== 0 && !form.pid">是</a-radio>
         <a-radio :value="false" :disabled="form.id !== 0 && !form.pid">否</a-radio>
       </a-radio-group>
-    </el-form-item>
+    </a-form-item>
     <!-- 上级分类 -->
-    <el-form-item v-show="showMore" label="上级分类" prop="pid">
+    <a-form-item v-show="showMore" label="上级分类" :name="[pid]">
       <a-select v-model:value="form.pid" placeholder="请选择上级分类名称">
         <a-select-option v-for="item in categoryList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
       </a-select>
-    </el-form-item>
+    </a-form-item>
     <!-- 分类图片 -->
-    <el-form-item label="分类图片" v-show="showMore">
-      <el-upload
-        ref="uploadRef"
-        class="upload-demo"
-        v-model:file-list="fileList"
-        :action="uploadPictureURL()"
-        :headers="{ jwt: token }"
-        :data="{ type: 'category_picture' }"
-        :limit="1"
-        :on-exceed="handleExceed"
-        :on-success="uploadSuccess"
-      >
-        <template #trigger>
-          <a-button type="primary">请选择图片</a-button>
-        </template>
-        <template #tip>
-          <div class="el-upload__tip">图片文件大小不超过 500KB</div>
-        </template>
-      </el-upload>
-    </el-form-item>
+    <a-form-item label="分类图片" v-show="showMore">
+      <a-upload 
+      v-model:file-list="fileList"
+       :action="uploadPictureURL()"
+        :headers="{ jwt: token, 'X-Requested-With': null }"
+         :data="{ type: 'category_picture' }" 
+         :multiple="false"
+        @change="handleChange">
+        <a-button>
+          <upload-outlined></upload-outlined>
+          选择图片
+        </a-button>
+      </a-upload>
+    </a-form-item>
     <!-- 操作按钮 -->
-    <el-form-item>
+    <a-form-item>
       <a-button type="primary" @click="editSubmit" v-if="id">修改</a-button>
       <a-button type="primary" @click="addSubmit" v-else>新增</a-button>
       <a-button @click="btnCancel">重置</a-button>
-    </el-form-item>
-  </el-form>
+    </a-form-item>
+  </a-form>
 </template>
 
 <script setup>
@@ -114,24 +108,17 @@ const handleExceed = (files) => {
   uploadRef.value.submit();
 };
 
-// 上传成功
-const uploadSuccess = (response) => {
-  const { errno, errmsg, data } = response;
-  if (errno !== 0) {
+// 上传文件变化处理(包含上传中、完成、失败)
+const handleChange = (info) => {
+  if (info.file.status === 'done') {
+    form.picture = info.file.response.data.savepath;
+  } else if (info.file.status === 'error') {
     notification({
-      message: errmsg,
-      type: 'error',
+      message: '上传失败',
+      type: 'error'
     });
-  } else {
-    if (errmsg !== '') {
-      notification({
-        message: errmsg,
-        type: 'success',
-      });
-    }
-    form.picture = data.savepath;
   }
-};
+}
 
 onMounted(() => {
   loadCategory();
@@ -139,18 +126,18 @@ onMounted(() => {
 
 const loadCategory = async () => {
   if (form.id) {
-    const data = await getCategory({ id: form.id });
-    if (data.picture !== '') {
-      const fileName = data.picture.substring(data.picture.lastIndexOf('/') + 1);
-      if (fileName) {
-        fileList.value = [{ name: fileName, url: data.picture }];
-      }
+    const data = await getCategory({ id: form.id })
+    const fileName = data.picture.substring(data.picture.lastIndexOf('/') + 1)
+    if (fileName) {
+      fileList.value = [{ name: fileName, url: data.picture }]
     }
-    Object.assign(form, data);
+    Object.assign(form, data)
   }
-  const list = await getCategoryList();
-  categoryList.value = list.filter((item) => item.pid === 0);
-};
+  const list = await getCategoryList()
+  categoryList.value = list.filter(item => item.pid === 0)
+  console.log(form)
+  showMore.value = form.pid != 0
+}
 
 const resetForm = (id) => {
   form.id = id;
