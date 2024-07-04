@@ -49,7 +49,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { getCategory, getCategoryList,uploadPictureURL } from '../api';
+import { getCategory, getCategoryList,uploadPictureURL,addCategory,editCategory } from '../api';
 import useToken from '../stores/token'
 
 
@@ -58,6 +58,7 @@ const showMore = ref(false);
 const fileList = ref([])
 const uploadRef = ref()
 const { token } = useToken()
+const emit = defineEmits(['success'])
 
 const props = defineProps({
   id: {
@@ -75,14 +76,24 @@ const form = reactive({
 const formRef = ref();
 
 // 新增操作
-const addSubmit = () => {
-  // 新增操作逻辑
-};
+const addSubmit = async () => {
+ const data = {
+ name: form.name,
+ picture: form.picture,
+ pid: form.pid
+ }
+ if (await addCategory(data)) {
+ emit('success')
+ }
+}
+
 
 // 修改操作
-const editSubmit = () => {
-  // 修改操作逻辑
-};
+const editSubmit = async () => {
+ if (await editCategory(form)) {
+ emit('success')
+ }
+}
 
 // 重置表单
 const btnCancel = () => {

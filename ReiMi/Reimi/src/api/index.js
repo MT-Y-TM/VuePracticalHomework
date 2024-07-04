@@ -33,3 +33,13 @@ export function getCategoryList() {
 export function getCategory(params) {
   return request.get('/admin/category', { params })
  }
+
+ // 新增分类接口
+export function addCategory(data) {
+  return request.post('/admin/category/add', data)
+ }
+ // 修改分类接口
+ export function editCategory(data) {
+  return request.post('/admin/category/save', data)
+ }
+ 
