@@ -72,10 +72,11 @@
     <el-form-item label="商品规格" prop="spec" style="width: 92%">
     <el-input v-model="form.spec" placeholder="请填写商品规格" />
     </el-form-item>
-    <!-- 商品简介 -->
-    <el-form-item label="商品简介" prop="description" style="width: 92%" c
-   lass="desc">
-    </el-form-item>
+   <!-- 商品简介 -->
+<el-form-item label="商品简介" prop="description" style="width: 92%" clas
+s="desc">
+ <Editor :init="initEditor" v-model="form.description"></Editor>
+</el-form-item>
     <!-- 操作按钮 -->
     <el-form-item>
     <el-button type="primary" @click="editSubmit()" v-if="form.id">修改
@@ -91,6 +92,13 @@ import { reactive, ref , onMounted} from 'vue'
 import { getCategoryList,uploadPictureURL,getGoods, addGoods, editGoods } from '../api'
 import useToken from '../stores/token'
 import { Plus } from '@element-plus/icons-vue'
+import Editor from '@tinymce/tinymce-vue'
+
+import 'tinymce/tinymce'
+import 'tinymce/models/dom'
+import 'tinymce/themes/silver'
+import 'tinymce/icons/default'
+import 'tinymce/plugins/image'
 
 
 const formRef = ref()
@@ -268,6 +276,18 @@ const handlePictureCardPreview = uploadFile => {
  albumDialogVisible.value = true
 }
 
+// 编辑器配置
+let initEditor = {
+width: '100%',
+ skin_url: '/tinymce/skins/ui/oxide',
+ content_css: '/tinymce/skins/content/default/content.css',
+ language_url: '/tinymce/langs/zh-Hans.js',
+ language: 'zh-Hans',
+ menubar: false,
+ statusbar: false,
+ toolbar: 'bold underline italic strikethrough image undo redo', 
+ plugins: 'image',
+}
 
 
 defineExpose({ resetForm })
@@ -279,4 +299,8 @@ defineExpose({ resetForm })
  text-align: left;
  width: 91%;
 }
+.tox-tinymce-aux {
+   z-index: 5000!important;
+  }
+  
 </style>
