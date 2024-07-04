@@ -1,21 +1,21 @@
 <template>
   <el-form ref="formRef" :model="form" label-width="120px">
     <!-- 分类名称 -->
-    <el-form-item prop="name" label="分类名称" style="width: 92%" :rules="[{ required: true, message: '请填写分类名称', trigger: 'blur' }]">
-      <el-input v-model="form.name" placeholder="请填写分类名称" />
-    </el-form-item>
+    <a-form-item name="name" label="分类名称" >
+      <a-input v-model:value="form.name" placeholder="请填写分类名称" />
+    </a-form-item>
     <!-- 是否为二级分类 -->
     <el-form-item label="二级分类">
-      <el-radio-group v-model="showMore">
-        <el-radio :label="true" :disabled="form.id !== 0 && !form.pid">是</el-radio>
-        <el-radio :label="false" :disabled="form.id !== 0 && !form.pid">否</el-radio>
-      </el-radio-group>
+      <a-radio-group v-model:value="showMore">
+        <a-radio :value="true" :disabled="form.id !== 0 && !form.pid">是</a-radio>
+        <a-radio :value="false" :disabled="form.id !== 0 && !form.pid">否</a-radio>
+      </a-radio-group>
     </el-form-item>
     <!-- 上级分类 -->
     <el-form-item v-show="showMore" label="上级分类" prop="pid">
-      <el-select v-model="form.pid" placeholder="请选择上级分类名称">
-        <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
-      </el-select>
+      <a-select v-model:value="form.pid" placeholder="请选择上级分类名称">
+        <a-select-option v-for="item in categoryList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
+      </a-select>
     </el-form-item>
     <!-- 分类图片 -->
     <el-form-item label="分类图片" v-show="showMore">
