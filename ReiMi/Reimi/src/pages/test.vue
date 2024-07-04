@@ -1,180 +1,136 @@
 <template>
-  <a-row :gutter="20">
-    <a-col :span="8">
-      <a-card class="box-card">
-        <template #title>
-          <div class="card-header">头像信息</div>
+  <div>
+    <a-button type="primary" @click="addRow" style="margin-bottom: 10px;">新增分类</a-button>
+    <!-- 分类管理 -->
+    <a-table ref="tableRef" :data-source="tableData" :row-key="record => record.id" :columns="columns" bordered>
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'name'">
+          {{ record.name }}
         </template>
-        <div class="text item">
-          <div class="avatar">
-            <a-avatar class="avatar" shape="square" :size="50" :src="avatarURL" />
-          </div>
-          <a-upload
-            ref="uploadRef"
-            class="upload-demo"
-            :max-count="1"
-            :action="uploadURL"
-            :headers="headers"
-            :data="uploadData"
-            :auto-upload="false"
-            :on-success="uploadSuccess"
-            :before-upload="beforeUpload"
-            list-type="picture"
-          >
-          <a-button>
-            <upload-outlined></upload-outlined>
-            选择头像
-          </a-button>
-         
-            <template #tip>
-              <div class="el-upload__tip">
-                <p>限制上传 1 个文件，且旧文件会被新文件覆盖</p>
-              </div>
-            </template>
-          </a-upload>
-        </div>
-      </a-card>
-    </a-col>
-    <a-col :span="16">
-      <a-card class="box-card">
-        <template #title>
-          <div class="card-header">个人信息</div>
+        <template v-if="column.dataIndex === 'level'">
+          <span v-if="record.pid == 0">一级分类</span>
+          <span v-else>二级分类</span>
         </template>
-        <div class="change-password-box">
-          <a-form ref="ruleFormRef" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-            <a-form-item label="请输入修改的密码" name="password">
-              <a-input-password v-model:value="form.password" />
-            </a-form-item>
-            <a-form-item label="请再一次输入密码" name="password2">
-              <a-input-password v-model:value="form.password2" />
-            </a-form-item>
-            <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
-              <a-button type="primary" @click="submitForm">提交</a-button>
-              <a-button @click="resetForm">重置</a-button>
-            </a-form-item>
-          </a-form>
-        </div>
-      </a-card>
-    </a-col>
-  </a-row>
+        <template v-if="column.dataIndex === 'id'">
+          {{ record.id }}
+        </template>
+        <template v-if="column.dataIndex === 'picture'">
+          <a-image v-if="record.picture" :src="record.picture" :preview="false" style="max-height: 60px;"/>
+        </template>
+        <template v-if="column.dataIndex === 'actions'">
+          <a-button type="link" @click="editRow(record)">编辑</a-button>
+          <a-button type="link" @click="delRow(record)" style="color: #f5222d;">删除</a-button>
+        </template>
+      </template>
+    </a-table>
+    <!-- 新增分类的弹出框 -->
+    <a-drawer v-model:visible="dialogVisible" title="分类编辑" placement="right" :wrap-style="{ width: '80%' }">
+      <CategoryEdit ref="categoryForm" :id="id" @success="editSuccess" />
+    </a-drawer>
+  </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
-import defaultAvatarURL from '/images/avatar-default.png';
-import { uploadPictureURL, changeAdminPassword, changeAdminAvatar } from '../api';
-import useToken from '../stores/token';
-import useAdmin from '../stores/admin';
-import router from '../router';
-import notification from '../utils/notification';
+import { ref, onMounted } from 'vue'
+import { getCategoryList, delCategory } from '../api'
+import { message } from 'ant-design-vue'
+import CategoryEdit from '../components/CategoryEdit.vue'
 
-const { admin, removeAdmin, updateAdmin } = useAdmin();
-const { token, removeToken } = useToken();
+const tableData = ref([])
+const dialogVisible = ref(false)
+const id = ref(0)
+const columns = ref([
+  {
+    title: '分类名称',
+    dataIndex: 'name',
+    key: 'name',
+    sorter: true,
+  },
+  {
+    title: '分类级别',
+    dataIndex: 'level',
+    key: 'level',
+  },
+  {
+    title: '分类编号',
+    dataIndex: 'id',
+    key: 'id',
+  },
+  {
+    title: '分类图片',
+    dataIndex: 'picture',
+    key: 'picture',
+  },
+  {
+    title: '操作',
+    dataIndex: 'actions',
+    key: 'actions',
+  },
+])
 
-const headers = { jwt: token };
-const uploadURL = uploadPictureURL();
-const uploadData = { type: 'admin_avatar' };
+onMounted(() => {
+  loadCategoryList()
+})
 
-const form = reactive({
-  password: '',
-  password2: ''
-});
+// 查询分类列表
+const loadCategoryList = async () => {
+  const data = await getCategoryList()
+  tableData.value = convertToTree(data)
+}
 
-const avatarURL = ref(admin.avatar || defaultAvatarURL);
-const ruleFormRef = ref();
-const uploadRef = ref();
-
-const beforeUpload = file => {
-  // This function is used to control whether the file can be uploaded.
-  // Here we just return true for simplicity.
-  return false;
-};
-
-const submitForm = async () => {
-  try {
-    await ruleFormRef.value.validate();
-    await changeAdminPassword({ password: form.password });
-    resetForm();
-    removeToken();
-    removeAdmin();
-    router.push({ name: 'login' });
-    notification({
-      message: '修改密码后，请重新登录',
-      type: 'warning'
-    });
-  } catch (error) {
-    notification({
-      message: '表单填写有误',
-      type: 'error'
-    });
+// 将一维数组转换成树形结构的方法
+const convertToTree = data => {
+  const treeData = []
+  const map = {}
+  for (const item of data) {
+    map[item.id] = { ...item, children: [] }
   }
-};
-
-const resetForm = () => {
-  ruleFormRef.value.resetFields();
-};
-
-const submitUpload = () => {
-  uploadRef.value.submit();
-};
-
-const uploadSuccess = async response => {
-  const { errno, errmsg, data } = response;
-  if (errno !== 0) {
-    notification({
-      message: errmsg,
-      type: 'error'
-    });
-  } else {
-    if (errmsg !== '') {
-      notification({
-        message: errmsg,
-        type: 'success'
-      });
+  for (const item of data) {
+    const node = map[item.id]
+    if (item.pid === 0) {
+      treeData.push(node)
+    } else {
+      const parent = map[item.pid]
+      parent.children.push(node)
     }
-    await changeAdminAvatar({
-      avatar: data.savepath
-    });
-    updateAdmin({
-      avatar: data.url
-    });
-    avatarURL.value = data.url;
   }
-  uploadRef.value.clearFiles();
-};
+  return treeData
+}
 
-const validatePass = async (rule, value) => {
-  if (value !== form.password) {
-    throw new Error('两次输入密码不一致！');
+// 关闭弹出框前调用的函数
+const handleBeforeClose = () => {
+  message.info('Dialog is closing')
+  dialogVisible.value = false
+}
+
+const editSuccess = () => {
+  loadCategoryList()
+  dialogVisible.value = false
+}
+
+// 新增分类
+const addRow = () => {
+  id.value = 0
+  dialogVisible.value = true
+}
+
+// 修改分类
+const editRow = row => {
+  id.value = row.id
+  dialogVisible.value = true
+}
+
+// 删除分类
+const delRow = async row => {
+  if (row.pid == 0 && row.children.length != 0) {
+    message.warning('该分类下存在二级分类，请先删除二级分类再删除此分类')
+  } else {
+    const confirmResult = await message.confirm('确定要删除此分类吗？')
+    if (confirmResult === 'ok') {
+      if (await delCategory({ id: row.id })) {
+        loadCategoryList()
+      }
+    }
   }
-};
-
-const rules = {
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 24, message: '密码长度为 6~24 个字符', trigger: 'blur' }
-  ],
-  password2: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { validator: validatePass, trigger: 'blur' }
-  ]
-};
+}
 </script>
-
-<style lang="scss" scoped>
-.avatar {
-  text-align: center;
-}
-
-.upload-demo {
-  text-align: center;
-}
-
-.box-card {
-  height: 316px;
-}
-
-.change-password-box {
-  padding-top: 38px;
-}
-</style>
