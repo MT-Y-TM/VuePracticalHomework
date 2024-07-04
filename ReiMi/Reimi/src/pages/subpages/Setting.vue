@@ -1,13 +1,13 @@
 <template>
-  <el-row :gutter="20">
-    <el-col :span="8">
-      <el-card class="box-card">
-        <template #header>
+  <a-row :gutter="20">
+    <a-col :span="8">
+      <a-card class="box-card">
+        <template #title>
           <div class="card-header">头像信息</div>
         </template>
         <div class="text item">
           <div class="avatar">
-            <el-avatar class="avatar" shape="square" :size="50" :src="avatarURL" />
+            <a-avatar class="avatar" shape="square" :size="50" :src="avatarURL" />
           </div>
           <el-upload
             ref="uploadRef"
@@ -32,11 +32,11 @@
             </template>
           </el-upload>
         </div>
-      </el-card>
-    </el-col>
-    <el-col :span="16">
-      <el-card class="box-card">
-        <template #header>
+      </a-card>
+    </a-col>
+    <a-col :span="16">
+      <a-card class="box-card">
+        <template #title>
           <div class="card-header">个人信息</div>
         </template>
         <div class="change-password-box">
@@ -53,9 +53,9 @@
             </a-form-item>
           </a-form>
         </div>
-      </el-card>
-    </el-col>
-  </el-row>
+      </a-card>
+    </a-col>
+  </a-row>
 </template>
 
 <script setup>
