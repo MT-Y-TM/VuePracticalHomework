@@ -41,9 +41,29 @@
    </template>
    </el-upload>
   </el-form-item>
-    <!-- 商品相册 -->
-    <el-form-item label="图片相册" prop="album">
-    </el-form-item>
+   <!-- 商品相册 -->
+<el-form-item label="图片相册" prop="album">
+   <el-upload
+   ref="albumUploadRef"
+   class="upload-demo"
+   list-type="picture-card"
+   v-model:file-list="albumFileList"
+   :action="uploadURL"
+   :data="{ type: 'goods_album' }"
+   :headers="headers"
+   :on-preview="handlePictureCardPreview"
+   :on-remove="albumHandleRemove"
+   :on-success="albumUploadSuccess"
+   :multiple="true"
+   >
+   <el-icon>
+   <Plus />
+   </el-icon>
+</el-upload>
+<el-dialog v-model="albumDialogVisible" align-center width="30%">
+<el-Image :src="albumDialogImageUrl" />
+</el-dialog>
+</el-form-item>
     <!-- 商品库存 -->
     <el-form-item label="商品库存" prop="stock" style="width: 92%">
     <el-input v-model="form.stock" placeholder="请填写库存数量" />
@@ -70,6 +90,7 @@
 import { reactive, ref , onMounted} from 'vue'
 import { getCategoryList,uploadPictureURL } from '../api'
 import useToken from '../stores/token'
+import { Plus } from '@element-plus/icons-vue'
 
 
 const formRef = ref()
@@ -80,6 +101,10 @@ const uploadRef = ref()
 const uploadURL = uploadPictureURL()
 const { token } = useToken()
 const headers = { jwt: token }
+const albumUploadRef = ref()
+const albumDialogImageUrl = ref('')
+const albumDialogVisible = ref(false)
+const albumFileList = ref([])
 
 
 
@@ -116,7 +141,8 @@ const btnCancel = () => {
  formRef.value.resetFields()
  form.picture = ''
  uploadRef.value.clearFiles()
-
+ form.album = []
+ albumUploadRef.value.clearFiles()
  loadGoods()
 }
 
@@ -172,6 +198,38 @@ type: 'success'
 form.picture = data.savepath
 }
 }
+
+// 相册图上传成功
+const albumUploadSuccess = response => {
+ const { errno, errmsg, data } = response
+ if (errno !== 0) {
+ notification({
+ message: errmsg,
+ type: 'error'
+ })
+ } else {
+ if (errmsg !== '') {
+ notification({
+ message: errmsg,
+ type: 'success'
+ })
+ }
+ form.album.push(data.savepath)
+ }
+}
+// 删除相册图
+const albumHandleRemove = (removeFile, uploadFiles) => {
+ form.album = []
+ uploadFiles.forEach(item => {
+ form.album.push(item.url.replace(/^https?:\/\/.*?\//, ''))
+ })
+}
+// 预览已上传的相册图
+const handlePictureCardPreview = uploadFile => {
+ albumDialogImageUrl.value = uploadFile.url
+ albumDialogVisible.value = true
+}
+
 
 
 defineExpose({ resetForm })
