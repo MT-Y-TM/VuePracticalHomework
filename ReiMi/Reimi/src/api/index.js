@@ -23,4 +23,13 @@ export function changeAdminPassword(data) {
   export function uploadPictureURL() {
   return config.baseURL + '/admin/upload/picture'
   }
+
+  // 分类列表接口
+export function getCategoryList() {
+  return request.get('/admin/category/list')
+ }
   
+ // 查询单个分类接口
+export function getCategory(params) {
+  return request.get('/admin/category', { params })
+ }

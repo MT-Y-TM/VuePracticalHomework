@@ -9,28 +9,29 @@
           <div class="avatar">
             <a-avatar class="avatar" shape="square" :size="50" :src="avatarURL" />
           </div>
-          <el-upload
+          <a-upload
             ref="uploadRef"
             class="upload-demo"
-            :limit="1"
+            :max-count="1"
             :action="uploadURL"
             :headers="headers"
             :data="uploadData"
             :auto-upload="false"
             :on-success="uploadSuccess"
+            :before-upload="beforeUpload"
+            list-type="picture"
           >
-            <template #trigger>
-              <p><a-button type="dashed">选择头像</a-button></p>
-            </template>
-            <div>
-              <a-button type="primary" @click="submitUpload">上传头像</a-button>
-            </div>
+          <a-button>
+            <upload-outlined></upload-outlined>
+            选择头像
+          </a-button>
+         
             <template #tip>
               <div class="el-upload__tip">
                 <p>限制上传 1 个文件，且旧文件会被新文件覆盖</p>
               </div>
             </template>
-          </el-upload>
+          </a-upload>
         </div>
       </a-card>
     </a-col>
@@ -86,7 +87,7 @@ const uploadRef = ref();
 const beforeUpload = file => {
   // This function is used to control whether the file can be uploaded.
   // Here we just return true for simplicity.
-  return true;
+  return false;
 };
 
 const submitForm = async () => {
