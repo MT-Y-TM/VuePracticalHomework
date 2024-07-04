@@ -1,130 +1,129 @@
 <template>
-    <div>
-    <el-button type="primary" style="margin-bottom: 10px;" @click="addRow">新增商品</el-button>
+  <div>
+    <a-button type="primary" style="margin-bottom: 10px;" @click="addRow">新增商品</a-button>
     <!-- 新增商品的弹出框 -->
-<el-dialog v-model="dialogVisible" :title="id ? '修改商品' : '新增商品'" :before-close="handleBeforeClose">
-    <GoodsEdit ref="goodsForm" :id="id" @success="editSuccess"></GoodsEdit>
-</el-dialog>
+    <a-modal v-model:visible="dialogVisible" :title="id ? '修改商品' : '新增商品'" @cancel="handleBeforeClose">
+      <GoodsEdit ref="goodsForm" :id="id" @success="editSuccess"></GoodsEdit>
+    </a-modal>
     <!-- 商品列表 -->
-    <el-table :data="goodsList" style="width: 100%; margin-bottom: 20px" 
-   row-key="id" border default-expand-all>
-    <el-table-column prop="id" label="商品编号" width="100" />
-    <el-table-column prop="name" label="商品名称" width="260" />
-    <el-table-column prop="price" label="商品价格" width="100" />
-    <el-table-column prop="stock" label="商品库存" width="100" />
-    <el-table-column prop="description" label="商品简介" />
-    <el-table-column prop="picture" label="商品图片" width="120">
-    <template #default="{ row }">
-    <el-image v-if="row.picture != ''" :src="row.picture" fit="contain" style="display: flex; align-items: center; height: 60px;" />
-    </template>
-    </el-table-column>
-    <el-table-column fixed="right" label="操作" width="200">
-    <template #default="{ row }">
-    <el-button type="warning" @click="editRow(row)">编辑</el-button>
-    <el-button type="danger" @click="delRow(row)">删除</el-button>
-    </template>
-    </el-table-column>
-    </el-table>
-    <el-pagination
-    v-model:current-page="page"
-    background layout="prev, pager, next"
-    :total="total"
-    :page-size="pagesize"
-    @current-change="handleCurrentChange"
-    style="margin-bottom: 50px;"
+    <a-table :dataSource="goodsList" style="width: 100%; margin-bottom: 20px" rowKey="id" bordered>
+      <a-table-column key="id" dataIndex="id" title="商品编号" width="100" />
+      <a-table-column key="name" dataIndex="name" title="商品名称" width="260" />
+      <a-table-column key="price" dataIndex="price" title="商品价格" width="100" />
+      <a-table-column key="stock" dataIndex="stock" title="商品库存" width="100" />
+      <a-table-column key="description" dataIndex="description" title="商品简介" />
+      <a-table-column key="picture" dataIndex="picture" title="商品图片" width="120">
+        <template #default="{ record }">
+          <a-image v-if="record.picture != ''" :src="record.picture" fit="contain" style="display: flex; align-items: center; height: 60px;" />
+        </template>
+      </a-table-column>
+      <a-table-column key="action" title="操作" width="200">
+        <template #default="{ record }">
+          <a-button type="warning" @click="editRow(record)">编辑</a-button>
+          <a-button type="danger" @click="delRow(record)">删除</a-button>
+        </template>
+      </a-table-column>
+    </a-table>
+    <a-pagination
+      v-model:current="page"
+      :total="total"
+      :page-size="pagesize"
+      @change="handleCurrentChange"
+      style="margin-bottom: 50px;"
     />
-    </div>
-   </template>
-   
+  </div>
+</template>
 
-   <script setup>
-   import { ref, onMounted } from 'vue'
-   import { getGoodsList , delGoods } from '../../api'
-   import GoodsEdit from '../../components/GoodsEdit.vue'
-import { ElMessageBox } from 'element-plus'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { getGoodsList, delGoods } from '../../api'
+import GoodsEdit from '../../components/GoodsEdit.vue'
+import { message, Modal } from 'ant-design-vue'
 
-   const goodsList = ref([])
-   const page = ref(1)
-   const pagesize = ref(10)
-   const total = ref(0)
-   const id = ref()
+const goodsList = ref([])
+const page = ref(1)
+const pagesize = ref(10)
+const total = ref(0)
+const id = ref()
 const dialogVisible = ref(false)
 const goodsForm = ref()
 
+onMounted(() => {
+  loadGoodsList()
+})
 
-   onMounted(() => {
-   loadGoodsList()
-   })
-   const loadGoodsList = async () => {
-   const params = {
-   page: page.value,
-   pagesize: pagesize.value
-   }
-   const data = await getGoodsList(params)
-   goodsList.value = data.list.map(item => {
-   item.description = removeTages(item.description)
-   return item
-   })
-   total.value = data.total
-   }
-   // 去掉标签，仅显示文字
-const removeTages = str => {
-return str.replace(/<[^>]+>/g, '')
+const loadGoodsList = async () => {
+  const params = {
+    page: page.value,
+    pagesize: pagesize.value
+  }
+  const data = await getGoodsList(params)
+  goodsList.value = data.list.map(item => {
+    item.description = removeTags(item.description)
+    return item
+  })
+  total.value = data.total
 }
+
+// 去掉标签，仅显示文字
+const removeTags = str => {
+  return str.replace(/<[^>]+>/g, '')
+}
+
 // 新增商品
 const addRow = () => {
-    if (goodsForm.value) {
- goodsForm.value.resetForm(0)
- }
-
-    id.value = 0
-dialogVisible.value = true
+  if (goodsForm.value) {
+    goodsForm.value.resetForm(0)
+  }
+  id.value = 0
+  dialogVisible.value = true
 }
+
 // 修改商品
 const editRow = row => {
-    if (goodsForm.value) {
- goodsForm.value.resetForm(row.id)
- }
-
-    id.value = row.id
-dialogVisible.value = true
+  if (goodsForm.value) {
+    goodsForm.value.resetForm(row.id)
+  }
+  id.value = row.id
+  dialogVisible.value = true
 }
+
 // 删除商品
 const delRow = row => {
- ElMessageBox.confirm('确定要删除此商品吗？', {
- closeOnClickModal: false,
- confirmButtonText: '确定',
- cancelButtonText: '取消',
- }).then(async () => {
- if (await delGoods({ id: row.id })) {
- loadGoodsList()
- }
- }).catch(() => {})
+  Modal.confirm({
+    title: '确定要删除此商品吗？',
+    onOk: async () => {
+      if (await delGoods({ id: row.id })) {
+        loadGoodsList()
+      }
+    },
+    onCancel() {}
+  })
 }
+
 // 换页
 const handleCurrentChange = value => {
- page.value = value
- loadGoodsList()
+  page.value = value
+  loadGoodsList()
 }
 
 // 编辑完成
 const editSuccess = () => {
- loadGoodsList()
- dialogVisible.value = false
-}
-// 关闭弹出框前
-const handleBeforeClose = () => {
- ElMessageBox.confirm('确定关闭对话框吗？', {
- showClose: false,
- closeOnClickModal: false,
- confirmButtonText: '确定',
- cancelButtonText: '取消',
-}).then(() => {
- dialogVisible.value = false
- setTimeout(() => {
-    goodsForm.value.resetForm()
- }, 500)
-}).catch(() => { })
+  loadGoodsList()
+  dialogVisible.value = false
 }
 
+// 关闭弹出框前
+const handleBeforeClose = () => {
+  Modal.confirm({
+    title: '确定关闭对话框吗？',
+    onOk: () => {
+      dialogVisible.value = false
+      setTimeout(() => {
+        goodsForm.value.resetForm()
+      }, 500)
+    },
+    onCancel() {}
+  })
+}
 </script>
