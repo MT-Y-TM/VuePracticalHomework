@@ -54,3 +54,18 @@ export function getGoodsList(params) {
   return request.get('/admin/goods/list', { params })
  }
  
+ // 查询单个商品接口
+export function getGoods(params) {
+  return request.get('/admin/goods', { params })
+ }
+
+ // 新增商品接口
+export function addGoods(data) {
+  return request.post('/admin/goods/add', data)
+ }
+
+ // 修改商品接口
+export function editGoods(data) {
+  return request.post('/admin/goods/save', data)
+ }
+ 

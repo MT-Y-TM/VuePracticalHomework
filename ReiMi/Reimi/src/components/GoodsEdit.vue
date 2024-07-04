@@ -88,7 +88,7 @@
 
    <script setup>
 import { reactive, ref , onMounted} from 'vue'
-import { getCategoryList,uploadPictureURL } from '../api'
+import { getCategoryList,uploadPictureURL,getGoods, addGoods, editGoods } from '../api'
 import useToken from '../stores/token'
 import { Plus } from '@element-plus/icons-vue'
 
@@ -130,12 +130,30 @@ const albumFileList = ref([])
  description: ''
 })
 
-// 新增操作
-const addSubmit = () => {
+// 新增商品
+const addSubmit = async () => {
+ const data = {
+ name: form.name,
+ category_id: form.category_id,
+ price: form.price,
+ picture: form.picture,
+ album: form.album,
+ stock: form.stock,
+ spec: form.spec,
+ description: form.description
+ }
+ if (await addGoods(data)) {
+ emit('success')
+ }
 }
-// 修改操作
-const editSubmit = () => {
+
+// 修改商品
+const editSubmit = async () => {
+ if (await editGoods(form)) {
+ emit('success')
+ }
 }
+
 // 重置表单
 const btnCancel = () => {
  formRef.value.resetFields()
@@ -153,6 +171,26 @@ const resetForm = id => {
 
 
 const loadGoods = async () => {
+   if (form.id) {
+ const goods = await getGoods({ id: form.id })
+ if (goods.picture !== '') {
+ const fileName = goods.picture.substring(goods.picture.lastIndexOf
+('/') + 1)
+ if (fileName) {
+ fileList.value = [{ name: fileName, url: goods.picture }]
+ }
+ }
+ albumFileList.value = goods.album.map(item => {
+ return {
+ name: item.picture.substring(item.picture.lastIndexOf('/') + 1),
+ url: item.picture
+ }
+ })
+ goods.album = goods.album.map(item => {
+ return item.picture.replace(/^https?:\/\/.*?\//, '')
+ })
+ Object.assign(form, goods)
+ }
  const data = await getCategoryList()
  categoryList.value = convertToTree(data)
 }

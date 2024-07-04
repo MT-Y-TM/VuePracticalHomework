@@ -110,9 +110,12 @@ const handleBeforeClose = () => {
  closeOnClickModal: false,
  confirmButtonText: '确定',
  cancelButtonText: '取消',
- }).then(() => {
+}).then(() => {
  dialogVisible.value = false
- }).catch(() => {})
+ setTimeout(() => {
+    goodsForm.value.resetForm()
+ }, 500)
+}).catch(() => { })
 }
 
 </script>
