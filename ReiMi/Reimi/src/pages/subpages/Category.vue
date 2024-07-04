@@ -32,8 +32,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getCategoryList } from '../../api'
-import { ElMessageBox } from 'element-plus'
+import { getCategoryList,delCategory } from '../../api'
+import { ElMessageBox,ElMessage } from 'element-plus'
 import CategoryEdit from '../../components/CategoryEdit.vue'
 
 const tableData = ref([])
@@ -110,6 +110,22 @@ const editRow = row => {
 
 // 删除分类
 const delRow = row => {
-  // 删除逻辑待实现
+ if (row.pid == 0 && row.children.length != 0) {
+ ElMessage({
+ type: 'warning',
+ message: '该分类下存在二级分类，请先删除二级分类再删除此分类'
+ })
+ } else {
+ ElMessageBox.confirm('确定要删除此分类吗？', {
+ closeOnClickModal: false,
+ confirmButtonText: '确定',
+ cancelButtonText: '取消',
+ }).then(async () => {
+ if (await delCategory({ id: row.id })) {
+ loadCategoryList()
+ }
+ }).catch(() => {})
+ }
 }
+
 </script>

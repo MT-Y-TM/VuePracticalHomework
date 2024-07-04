@@ -38,8 +38,13 @@ export function getCategory(params) {
 export function addCategory(data) {
   return request.post('/admin/category/add', data)
  }
+ 
  // 修改分类接口
  export function editCategory(data) {
   return request.post('/admin/category/save', data)
  }
  
+ // 删除分类接口
+export function delCategory(data) {
+  return request.post('/admin/category/del', data)
+ }
