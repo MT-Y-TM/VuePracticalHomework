@@ -48,3 +48,9 @@ export function addCategory(data) {
 export function delCategory(data) {
   return request.post('/admin/category/del', data)
  }
+
+ // 商品列表接口
+export function getGoodsList(params) {
+  return request.get('/admin/goods/list', { params })
+ }
+ 
