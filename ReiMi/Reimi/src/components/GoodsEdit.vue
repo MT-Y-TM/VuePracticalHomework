@@ -18,9 +18,29 @@
     <el-form-item label="商品价格" prop="price" style="width: 92%">
     <el-input v-model="form.price" placeholder="请填写商品价格" />
     </el-form-item>
-    <!-- 商品图片 -->
-    <el-form-item label="商品图片" prop="picture">
-    </el-form-item>
+   <!-- 商品图片 -->
+<el-form-item label="商品图片">
+   <el-upload
+   ref="uploadRef"
+   v-model:file-list="fileList"
+   class="upload-demo"
+   :action="uploadURL"
+   :headers="headers"
+   :data="{ type: 'goods_picture' }"
+   :limit="1"
+   :on-exceed="handleExceed"
+   :on-success="uploadSuccess"
+   >
+   <template #trigger>
+   <el-button type="primary" style="text-align: left;">选择图片</el-button>
+   </template>
+   <template #tip>
+   <div class="el-upload__tip">
+   图片文件大小不超过 500KB
+   </div>
+   </template>
+   </el-upload>
+  </el-form-item>
     <!-- 商品相册 -->
     <el-form-item label="图片相册" prop="album">
     </el-form-item>
@@ -48,11 +68,19 @@
 
    <script setup>
 import { reactive, ref , onMounted} from 'vue'
-import { getCategoryList } from '../api'
+import { getCategoryList,uploadPictureURL } from '../api'
+import useToken from '../stores/token'
+
 
 const formRef = ref()
 const categoryList = ref([])
 const emit = defineEmits(['success'])
+const fileList = ref([])
+const uploadRef = ref()
+const uploadURL = uploadPictureURL()
+const { token } = useToken()
+const headers = { jwt: token }
+
 
 
    const props = defineProps({
@@ -86,6 +114,9 @@ const editSubmit = () => {
 // 重置表单
 const btnCancel = () => {
  formRef.value.resetFields()
+ form.picture = ''
+ uploadRef.value.clearFiles()
+
  loadGoods()
 }
 
@@ -117,6 +148,39 @@ const convertToTree = data => {
  return treeData
 }
 
+// 文件超出个数限制时替换已有图片
+const handleExceed = files => {
+uploadRef.value.clearFiles()
+uploadRef.value.handleStart(files[0])
+uploadRef.value.submit()
+}
+// 上传成功
+const uploadSuccess = response => {
+const { errno, errmsg, data } = response
+if (errno !== 0) {
+notification({
+message: errmsg,
+type: 'error'
+})
+} else {
+if (errmsg !== '') {
+notification({
+message: errmsg,
+type: 'success'
+})
+}
+form.picture = data.savepath
+}
+}
+
+
 defineExpose({ resetForm })
    </script>
    
+
+   <style scoped>
+.upload-demo {
+ text-align: left;
+ width: 91%;
+}
+</style>
