@@ -1,7 +1,7 @@
 <template>
-  <a-form ref="formRef" :model="form" label-width="120px">
+  <a-form ref="formRef" :model="form" >
     <!-- 分类名称 -->
-    <a-form-item label="分类名称" :rules="[{ required: true, message: '请填写分类名称', trigger: 'blur' }]">
+    <a-form-item label="分类名称">
       <a-input v-model:value="form.name" placeholder="请填写分类名称" />
     </a-form-item>
     <!-- 是否为二级分类 -->
@@ -12,9 +12,10 @@
       </a-radio-group>
     </a-form-item>
     <!-- 上级分类 -->
-    <a-form-item v-show="showMore" label="上级分类" :name="[pid]">
+    <a-form-item v-show="showMore" label="上级分类" :name="['pid']">
       <a-select v-model:value="form.pid" placeholder="请选择上级分类名称">
-        <a-select-option v-for="item in categoryList" :key="item.id" :value="item.id">{{ item.name }}</a-select-option>
+        <a-select-option v-for="item in categoryList" :key="item.id" :title="item.name" :value="item.id">{{ item.name
+          }}</a-select-option>
       </a-select>
     </a-form-item>
     <!-- 分类图片 -->
@@ -23,17 +24,14 @@
       v-model:file-list="fileList"
        :action="uploadPictureURL()"
         :headers="{ jwt: token, 'X-Requested-With': null }"
-         :data="{ type: 'category_picture' }" 
-         :multiple="false"
-        @change="handleChange">
-        <a-button>
-          <upload-outlined></upload-outlined>
-          选择图片
-        </a-button>
+         :data="{ type: 'category_picture' }"
+          :multiple="false"
+          @change="handleChange">
+        <a-button title="图片文件大小不超过500KB"><upload-outlined></upload-outlined>选择图片</a-button>
       </a-upload>
     </a-form-item>
     <!-- 操作按钮 -->
-    <a-form-item>
+    <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
       <a-button type="primary" @click="editSubmit" v-if="id">修改</a-button>
       <a-button type="primary" @click="addSubmit" v-else>新增</a-button>
       <a-button @click="btnCancel">重置</a-button>
@@ -42,87 +40,36 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import { getCategory, getCategoryList, uploadPictureURL, addCategory, editCategory } from '../api';
-import useToken from '../stores/token';
-
-const categoryList = ref([]);
-const showMore = ref(false);
-const fileList = ref([]);
-const uploadRef = ref();
-const { token } = useToken();
-const emit = defineEmits(['success']);
+import { ref, reactive, onMounted } from 'vue'
+import { getCategory, getCategoryList, uploadPictureURL, addCategory, editCategory } from '../api'
+import useToken from '../stores/token'
+import notification from '../utils/notification'
+import { UploadOutlined } from '@ant-design/icons-vue';
 
 const props = defineProps({
   id: {
-    type: Number,
-  },
-});
+    type: Number
+  }
+})
+
+const emit = defineEmits(['success'])
 
 const form = reactive({
   id: props.id,
   name: '',
   pid: '',
-  picture: '',
-});
+  picture: ''
+})
 
-const formRef = ref();
-
-// 新增操作
-const addSubmit = async () => {
-  const data = {
-    name: form.name,
-    picture: form.picture,
-    pid: form.pid,
-  };
-  try {
-    await addCategory(data);
-    emit('success');
-  } catch (error) {
-    console.error('添加分类失败:', error);
-  }
-};
-
-// 修改操作
-const editSubmit = async () => {
-  try {
-    await editCategory(form);
-    emit('success');
-  } catch (error) {
-    console.error('修改分类失败:', error);
-  }
-};
-
-// 重置表单
-const btnCancel = () => {
-  formRef.value.resetFields();
-  form.picture = '';
-  uploadRef.value.clearFiles();
-  loadCategory();
-};
-
-// 文件超出个数限制时替换已有图片
-const handleExceed = (files) => {
-  uploadRef.value.clearFiles();
-  uploadRef.value.handleStart(files[0]);
-  uploadRef.value.submit();
-};
-
-// 上传文件变化处理(包含上传中、完成、失败)
-const handleChange = (info) => {
-  if (info.file.status === 'done') {
-    form.picture = info.file.response.data.savepath;
-  } else if (info.file.status === 'error') {
-    notification({
-      message: '上传失败',
-      type: 'error'
-    });
-  }
-}
+const formRef = ref()
+const categoryList = ref([])
+const showMore = ref(false)
+const fileList = ref([])
+const { token } = useToken()
 
 onMounted(() => {
-  loadCategory();
-});
+  loadCategory()
+})
 
 const loadCategory = async () => {
   if (form.id) {
@@ -140,16 +87,54 @@ const loadCategory = async () => {
 }
 
 const resetForm = (id) => {
-  form.id = id;
-  btnCancel();
-};
+  form.id = id
+  btnCancel()
+}
 
-defineExpose({ resetForm });
+defineExpose({ resetForm })
+
+// 上传文件变化处理
+const handleChange = (info) => {
+  if (info.file.status === 'done') {
+    form.picture = info.file.response.data.savepath;
+  } else if (info.file.status === 'error') {
+    notification({
+      message: '上传失败',
+      type: 'error'
+    });
+  }
+}
+
+// 新增操作
+const addSubmit = async () => {
+  const data = {
+    name: form.name,
+    picture: form.picture,
+    pid: form.pid
+  }
+  if (await addCategory(data)) {
+    emit('success')
+  }
+}
+
+// 修改操作
+const editSubmit = async () => {
+  if (await editCategory(form)) {
+    emit('success')
+  }
+}
+
+// 重置表单
+const btnCancel = () => {
+  formRef.value.resetFields()
+  form.picture = ''
+  fileList.value = []
+  loadCategory()
+}
 </script>
 
 <style scoped>
-.upload-demo {
-  text-align: left;
+.ant-upload-drag-container {
   width: 91%;
 }
 </style>

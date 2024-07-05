@@ -9,29 +9,31 @@
           <div class="avatar">
             <a-avatar class="avatar" shape="square" :size="50" :src="avatarURL" />
           </div>
-          <el-upload
-            ref="uploadRef"
-            class="upload-demo"
-            :limit="1"
-            :action="uploadURL"
-            :headers="headers"
-            :data="uploadData"
-            :auto-upload="false"
-            :on-success="uploadSuccess"
-          >
-            <template #trigger>
-              <p><a-button type="dashed">选择头像</a-button></p>
-            </template>
-            <div>
-              <a-button type="primary" @click="submitUpload">上传头像</a-button>
+          <div class="upload-box">
+            <a-upload 
+          ref="uploadRef" 
+          v-model:file-list="fileList" 
+          :action="uploadPictureURL()"
+              :headers="{ jwt: token, 'X-Requested-With': null }"
+               :data="{ type: 'admin_avatar' }" 
+               :showUploadList="true"
+              :multiple="false"
+               @change="handleChange"
+               :max-count="1">
+              <a-button type="dashed">选择头像</a-button>
+            </a-upload>
+            <div class="upload-avatar">
+              <a-button type="primary" @click="submitUpload">
+                上传头像
+              </a-button>
             </div>
-            <template #tip>
+            <br>
               <div class="el-upload__tip">
                 <p>限制上传 1 个文件，且旧文件会被新文件覆盖</p>
               </div>
-            </template>
-          </el-upload>
+          </div>
         </div>
+
       </a-card>
     </a-col>
     <a-col :span="16">
@@ -79,6 +81,11 @@ const form = reactive({
   password2: ''
 });
 
+const avatar = reactive({
+  url: '',
+  savepath: ''
+})
+
 const avatarURL = ref(admin.avatar || defaultAvatarURL);
 const ruleFormRef = ref();
 const uploadRef = ref();
@@ -107,9 +114,12 @@ const resetForm = () => {
   ruleFormRef.value.resetFields();
 };
 
-const submitUpload = () => {
-  uploadRef.value.submit();
-};
+const submitUpload = async () => {
+  console.log(avatar)
+  changeAdminAvatar({ 'avatar': avatar.savepath })
+  updateAdmin({ avatar: avatar.url })
+  avatarURL.value = avatar.url
+}
 
 const uploadSuccess = async response => {
   const { errno, errmsg, data } = response;
@@ -135,6 +145,14 @@ const uploadSuccess = async response => {
   }
   uploadRef.value.clearFiles();
 };
+
+const handleChange = (info) => {
+  if (info.file.response) {
+    console.log(info.file.response.data)
+    avatar.savepath = info.file.response.data.savepath
+    avatar.url = info.file.response.data.url
+  }
+}
 
 const validatePass = async (rule, value) => {
   if (value !== form.password) {
@@ -169,5 +187,11 @@ const rules = {
 
 .change-password-box {
   padding-top: 38px;
+}
+.upload-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 </style>

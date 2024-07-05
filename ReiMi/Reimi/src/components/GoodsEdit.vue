@@ -20,9 +20,13 @@
      </a-form-item>
      <!-- 商品图片 -->
      <a-form-item label="商品图片">
-       <a-upload v-model:file-list="fileList" :action="uploadPictureURL()"
-         :headers="{ jwt: token, 'X-Requested-With': null }" :data="{ type: 'goods_picture' }" :multiple="false"
-         :max-size="500 * 1024" @change="handleChange">
+       <a-upload 
+       v-model:file-list="fileList"
+        :action="uploadPictureURL()"
+         :headers="{ jwt: token, 'X-Requested-With': null }"
+          :data="{ type: 'goods_picture' }"
+           :multiple="false"
+          @change="handleChange">
          <a-button title="图片文件大小不超过500KB"><upload-outlined></upload-outlined>选择图片</a-button>
        </a-upload>
      </a-form-item>
