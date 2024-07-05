@@ -97,6 +97,8 @@ const onSubmit = () => {
 //   重置表单
   const resetForm = () => {
     formRef.value.resetFields();
+    formState.username = '';
+    formState.password = '';
   };
 </script>
 

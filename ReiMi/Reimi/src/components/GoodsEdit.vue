@@ -1,5 +1,5 @@
 <template>
-   <a-form ref="formRef" :form="form" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+   <a-form ref="formRef" :model="form" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
      <!-- 商品名称 -->
      <a-form-item label="商品名称" :name="['name']">
        <a-input v-model:value="form.name" placeholder="请填写商品名称" />
@@ -30,23 +30,14 @@
          <a-button title="图片文件大小不超过500KB"><upload-outlined></upload-outlined>选择图片</a-button>
        </a-upload>
      </a-form-item>
-     <!-- 商品相册 -->
-     <a-form-item label="图片相册" :name="['album']">
-       <a-upload list-type="picture-card" :action="uploadURL" :data="{ type: 'goods_album' }" :headers="headers"
-         ref="uploadRef" :multiple="true">
-         <a-icon v-if="true" type="plus" />
-       </a-upload>
-       <a-modal v-model="albumDialogVisible" :centered="true" width="30%">
-         <a-img :src="albumDialogImageUrl" />
-       </a-modal>
-     </a-form-item>
+
      <!-- 商品库存 -->
      <a-form-item label="商品库存" :name="['stock']">
-       <a-input v-model="form.stock" placeholder="请填写库存数量" />
+       <a-input v-model:value="form.stock" placeholder="请填写库存数量" />
      </a-form-item>
      <!-- 商品规格 -->
      <a-form-item label="商品规格" :name="['spec']">
-       <a-input v-model="form.spec" placeholder="请填写商品规格" />
+       <a-input v-model:value="form.spec" placeholder="请填写商品规格" />
      </a-form-item>
      <!-- 商品简介 -->
      <a-form-item label="商品简介" :name="['description']" class="desc">
@@ -173,18 +164,18 @@
  }
  
  // 重置表单
- const btnCancel = () => {
+ const btnCancel = () => {  
    formRef.value.resetFields()
    form.picture = ''
-   // uploadRef.value.clearFiles()
+  //  uploadRef.value.clearFiles()
    form.album = []
-   // albumUploadRef.value.clearFiles()
+  //  albumUploadRef.value.clearFiles()
    loadGoods()
  }
  
  // 文件超出个数限制时替换已有图片
  const handleExceed = files => {
-   uploadRef.value.clearFiles()
+  //  uploadRef.value.clearFiles()
    uploadRef.value.handleStart(files[0])
    uploadRef.value.submit()
  }

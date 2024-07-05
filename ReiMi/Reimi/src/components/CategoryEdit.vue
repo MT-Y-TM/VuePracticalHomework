@@ -128,7 +128,7 @@ const editSubmit = async () => {
 const btnCancel = () => {
   formRef.value.resetFields()
   form.picture = ''
-  fileList.value = []
+  // fileList.value = []
   loadCategory()
 }
 </script>
